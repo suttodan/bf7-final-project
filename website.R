@@ -1,33 +1,45 @@
-covid_dataZipcode <- read.csv("COVID19_ZIP-Code (1).csv")
+library(shiny)
+library(tidyverse)
+
+covid_dataZipcode <- read_csv("data/covidByZipCode.csv")
 
 ui <- shinyUI(
+  
+  ## Header Panel (always visible)
   fluidPage(
-    h1("Covid-19: The Zip Code and Race Connection"),
-    br(),
-    h3("Mapping the Impact: How Race and Location Influence COVID-19 Cases", style = "text-align:center;"),
-    p(HTML("<strong>This dataset is collected by Public Health – Seattle & King County on Covid-19 cases</strong> grouped by zip code, Race, Population."), style = "text-align:center;"),
-    p(HTML("<em>Navigate through the data by clicking on the various tabs to explore the information. To better comprehend which city each zip code belongs to, click on the 'Zip Code Guide' tab. As you review the data, please keep in mind that certain zip codes may be experiencing a greater impact than others. It is important to consider the demographics of the individuals residing in those areas and how factors such as location and race may influence the level of care and resources they receive.</em>"), style = "text-align:center;"),
-    br(),
+    h1(HTML("<strong>Covid-19, Neighborhood, and Race</strong>"),
+       style = "text-align:center;"),
+    h3(HTML("<em>Mapping the Impact of COVID-19 on Marginalized 
+            Communities</em>"),
+       style = "text-align:center;"),
+    ## Main Panels
     tabsetPanel(
-      tabPanel("Main Page",
-               sidebarLayout(
-                 sidebarPanel(
-                   h3("ABOUT"),
-                   p("We are developing a webpage that facilitates a comparison of COVID-19 impact across different zip codes through the use of data visualization, making it easy to interpret and analyze the data.
-The webpage we are creating is intended for educators, public health workers, and decision-makers who are looking to gain insights into how different zip codes have been affected by COVID-19.
-The primary goal of the website is to shed light on how different zip codes/race groups have been impacted by COVID-19 and how health disparities can vary based on one's geographic location, particularly in terms of prevalent diseases." )
-                 ),
-                 mainPanel(
-                   h3("Below is sample of the data"),
-                   tableOutput("sample_data"),
-                   p("Below is map of King County"),
-                   img(alt = "IMG of King County zip code",
-                       src = "https://kingcounty.gov/~/media/operations/GIS/maps/vmc/images/zipcodes_586.ashx?la=en",
-                       width = "100%",
-                       height = "100%")
-                 )
-               )
-      ),
+      
+      ## Home Page
+      tabPanel("About",
+        sidebarLayout(
+          sidebarPanel(
+            p("We've created an interactive data visualization that allows for 
+              a comparison of COVID-19 impact across different zip codes and 
+              ethnicities. Our hope is that this is a useful tool for educators, 
+              public health workers, and decision-makers looking for insights 
+              into how some communities were disproportionately impacted by 
+              COVID-19."),
+            br(),
+            p(HTML("Our was collected and prepared by <strong>Public Health - 
+                   Seattle & King County</strong>, and covers all COVID 19 
+                   cases up through March 1, 2023. Their data continues to be 
+                   updated, and can be found on their website.")),
+            tags$a(href="https://kingcounty.gov/depts/health/covid-19/data/download.aspx",
+                   HTML("<strong>Public Health - Seattle & King County</strong>"))
+          ),
+          mainPanel(
+            img(alt = "King County Zip Code Boundaries",
+                src = "kingCountyZipCodes.jpg",
+                width = "100%",
+                height = "100%")))),
+      
+      ## Page 2
       tabPanel("Plot",
                sidebarLayout(
                  sidebarPanel(
