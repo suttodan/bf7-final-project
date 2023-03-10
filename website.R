@@ -1,7 +1,7 @@
 library(shiny)
 library(tidyverse)
 
-covid_dataZipcode <- read_csv("data/covidByZipCode.csv")
+covid <- read_csv("data/covidByZipCode.csv")
 
 ui <- shinyUI(
   
@@ -12,11 +12,10 @@ ui <- shinyUI(
     h3(HTML("<em>Mapping the Impact of COVID-19 on Marginalized 
             Communities</em>"),
        style = "text-align:center;"),
-    ## Main Panels
     tabsetPanel(
       
       ## Home Page
-      tabPanel("About",
+      tabPanel("General Information",
         sidebarLayout(
           sidebarPanel(
             p("We've created an interactive data visualization that allows for 
@@ -31,7 +30,30 @@ ui <- shinyUI(
                    cases up through March 1, 2023. Their data continues to be 
                    updated, and can be found on their website.")),
             tags$a(href="https://kingcounty.gov/depts/health/covid-19/data/download.aspx",
-                   HTML("<strong>Public Health - Seattle & King County</strong>"))
+                   HTML("<strong>Public Health - Seattle & King County</strong>")),
+            br(),
+            p("The ethnicities in this data set are as follows:"),
+            p("AIAN: American Indian or Alaska Native: individuals who 
+            identify as being descended from the original peoples of North 
+            America who maintain cultural identification through tribal 
+            affiliation or community recognition."),
+            p("ASIAN: individuals who identify as being of Asian 
+              descent."),
+            p("BLACK: individuals who identify as being of African 
+            descent, including those who are African American, Afro-Caribbean, 
+            or from other parts of the African diaspora."),
+            p("HISPANIC: individuals who identify as being of Hispanic, 
+              Latino, or Spanish origin, regardless of race."),
+            p("Multi/Other: who identify as being of more than one 
+            race or ethnicity, or who do not identify with any of the other 
+            categories listed."),
+            p("NHPI: individuals who identify as being descended from 
+              the original peoples of Hawaii, Guam, Samoa, or other Pacific 
+              Islands."),
+            p("Unknown: This category includes individuals who did not 
+              report their race or ethnicity."),
+            p("White: This category includes individuals who identify 
+              as being of European, Middle Eastern.")
           ),
           mainPanel(
             img(alt = "King County Zip Code Boundaries",
@@ -39,395 +61,57 @@ ui <- shinyUI(
                 width = "100%",
                 height = "100%")))),
       
-      ## Page 2
-      tabPanel("Plot",
-               sidebarLayout(
-                 sidebarPanel(
-                   actionButton("select_all", "Select All"),
-                   checkboxGroupInput("zip", "Select Zip Code(s):",
-                                      choices = unique(covid_dataZipcode$geo_id), 
-                                      selected = unique(covid_dataZipcode$geo_id)[1]),
-                   
-                   checkboxGroupInput("variable", "Select Variable(s) to Compare:", 
-                                      choices = c("case_count"),
-                                      selected = c("case_count"))
-                 ),
-                 mainPanel(
-                   plotOutput("my_plot"),
-                   verbatimTextOutput("highest_zip")
-                   
-                 )
-               )
-      ),
-      tabPanel("Plot by Race",
-               sidebarLayout(
-                 sidebarPanel(
-                   checkboxGroupInput("race", "Select race(s):", 
-                                      choices = unique(covid_dataZipcode$race_eth), 
-                                      selected = unique(covid_dataZipcode$race_eth)[1]),
-                   checkboxGroupInput("variable2", "Select to Compare:", 
-                                      choices = c("case_count"),
-                                      selected = c("case_count")),
-                   br(),
-                   h3("Key BOX"),
-                   p("AIAN: American Indian or Alaska Native: -------- individuals who identify as being descended from the original peoples of North America who maintain cultural identification through tribal affiliation or community recognition.
-ASIAN: -------- individuals who identify as being of Asian descent.
-
-BLACK: ------- individuals who identify as being of African descent, including those who are African American, Afro-Caribbean, or from other parts of the African diaspora.
-
-
-HISPANIC: ------- individuals who identify as being of Hispanic, Latino, or Spanish origin, regardless of race.
-
-Multi/Other: --------- who identify as being of more than one race or ethnicity, or who do not identify with any of the other categories listed.
-
-NHPI: -------  individuals who identify as being descended from the original peoples of Hawaii, Guam, Samoa, or other Pacific Islands.
-
-Unknown: ------- This category includes individuals who did not report their race or ethnicity.
-
-White: -------- This category includes individuals who identify as being of European, Middle Eastern.")
-                 ),
-                 mainPanel(
-                   plotOutput("plot2")
-                 )
-               )
-      ),
-      tabPanel("Table",
-               sidebarLayout(
-                 sidebarPanel(
-                   checkboxGroupInput(
-                     "checkbox",
-                     "Select columns to display:",
-                     choices = c("case_count","pop", "hosp_count", "death_count"),
-                     selected = "case_count"
-                   )
-                 ),
-                 mainPanel(
-                   tableOutput("data_table")
-                 )
-               )
-      ),
-      tabPanel("Zip Code Guide",
-               h3("Zip Code Guide"),
-               p("This tab provides a guide to the zip codes included in the dataset."),
-               br(),
-               p("98001	Algona ----,
-98001	Auburn ----,
-
-98001	Federal Way	----,
-
-98002	Auburn	----,
-
-98003	Auburn	----,
-
-98003	Federal Way	----,
-
-98004	Beaux Arts Village	----,
-
-98004	Bellevue	----,
-
-98004	Clyde Hill	----,
-
-98004	Hunts Point	----,
-
-98004	Yarrow Point	----,
-
-98005	Bellevue	----,
-
-98006	Bellevue	----,
-
-98007	Bellevue	----,
-
-98008	Bellevue	----,
-
-98009	Bellevue	----,
-
-98010	Black Diamond	----,
-
-98011	Bothell	----,
-
-98013	Burton	----,
-
-98013	Vashon	----,
-
-98014	Carnation	----,
-
-98015	Bellevue	----,
-
-98019	Duvall	----,
-
-98022	Enumclaw	----,
-
-98023	Auburn	----,
-
-98023	Federal Way	----,
-
-98024	Fall City	----,
-
-98025	Hobart	----,
-
-98027	Issaquah	----,
-
-98028	Kenmore	----,
-
-98028	Bothell	----,
-
-98029	Issaquah	----,
-
-98030	Kent	----,
-
-98031	Kent	----,
-
-98032	Kent ----,
-
-98033	Kirkland	----,
-
-98034	Kirkland	----,
-
-98035	Kent	----,
-
-98038	Maple Valley	----,
-
-98039	Medina	----,
-
-98040	Mercer Island	----,
-
-98041	Bothell	----,
-
-98042	Covington	----,
-
-98042	Kent	----,
-
-98045	North Bend	----,
-
-98047	Auburn	----,
-
-98047	Pacific	----,
-
-98050	Preston	----,
-
-98051	Ravensdale	----,
-
-98052	Redmond	----,
-
-98053	Redmond	----,
-
-98054	Redondo	----,
-
-98055	Renton	----,
-
-98056	Newcastle	----,
-
-98056	Renton	----,
-
-98057	Renton	----,
-
-98058	Renton	----,
-
-98059	Newcastle	----,
-
-98059	Renton	----,
-
-98062	Seahurst	----,
-
-98063	Auburn	----,
-
-98063	Federal Way	----,
-
-98064	Kent	----,
-
-98065	Snoqualmie	----,
-
-98068	Snoqualmie Pass	----,
-
-98068	Snoqualmie	----,
-
-98070	Vashon	----,
-
-98071	Auburn	----,
-
-98072	Woodinville	----,
-
-98073	Redmond	----,
-
-98074	Sammamish	----,
-
-98074	Redmond	----,
-
-98075	Sammamish	----,
-
-98075	Issaquah	----,
-
-98083	Kirkland	----,
-
-98092	Auburn	----,
-
-98093	Auburn	----,
-
-98093	Federal Way	----,
-
-98101	Seattle	----,
-
-98102	Seattle	----,
-
-98103	Seattle	----,
-
-98104	Seattle	----,
-
-98105	Seattle	----,
-
-98106	Seattle	----,
-
-98107	Seattle	----,
-
-98108	Seattle	----,
-
-98108	Tukwila	----,
-
-98109	Seattle	----,
-
-98111	Seattle	----,
-
-98112	Seattle ----,
-
-98114	Seattle	----,
-
-98115	Seattle	----,
-
-98116	Seattle	----,
-
-98117	Seattle	----,
-
-98118	Seattle	----,
-
-98119	Seattle	----,
-
-98121	Seattle	----,
-
-98122	Seattle	----,
-
-98124	Seattle	----,
-
-98125	Seattle	----,
-
-98126	Seattle	----,
-
-98131	Seattle	----,
-
-98132	Seattle	----,
-
-98133	Seattle	----,
-
-98133	Shoreline	----,
-
-98134	Seattle	----,
-
-98136	Seattle	----,
-
-98138	Seattle	----,
-
-98138	Tukwila	----,
-
-98144	Seattle	----,
-
-98145	Seattle	----,
-
-98146	Burien	----,
-
-98146	Seattle	----,
-
-98148	Burien	----,
-
-98148	Des Moines	----,
-
-98148	Normandy Park	----,
-
-98148	Seatac	----,
-
-98148	Seattle	----,
-
-98154	Seattle	----,
-
-98155	Lk Forest Park	----,
-
-98155	Lk Forest Pk	----,
-
-98155	Lake Forest Park ----,
-
-98155	Seattle	----,
-
-98155	Shoreline	----,
-
-98158	Seatac	----,
-
-98158	Seattle	----,
-
-98160	Seattle	----,
-
-98161	Seattle	----,
-
-98164	Seattle	----,
-
-98166	Burien	----,
-
-98166	Normandy Park	----,
-
-98166	Seattle	----,
-
-98168	Burien	----,
-
-98168	Seatac	----,
-
-98168	Seattle	----,
-
-98168	Tukwila	----,
-
-98171	Seattle	----,
-
-98174	Seattle	----,
-
-98177	Seattle	----,
-
-98177	Shoreline	----,
-
-98178	Seattle	----,
-
-98178	Tukwila	----,
-
-98188	Seatac	----,
-
-98188	Seattle	----,
-
-98188	Tukwila	----,
-
-98198	Des Moines	----,
-
-98198	Normandy Park	----,
-
-98198	Seatac	----,
-
-98198	Seattle	----,
-
-98199	Seattle	----,
-
-
-98224	Baring	----,
-
-98288	Skykomish."),
-               br()
-               
+      ## Page 2 - bar chart, each bar is a zip code, but ALL zip codes are included; check boxes filter for ethnicity
+      tabPanel("Zip Code Stats",
+        sidebarLayout(
+          sidebarPanel(
+            actionButton("select_all", "Select All"),
+            checkboxGroupInput("zip", "Select Zip Code(s):",
+                               inline = TRUE,
+                               choices = unique(covid$geo_id), 
+                               selected = unique(covid$geo_id)[1]),
+            checkboxGroupInput("variable", "Select Variable(s) to Compare:", 
+                               choices = c("case_count"),
+                               selected = c("case_count"))),
+          mainPanel(plotOutput("my_plot"), verbatimTextOutput("highest_zip")))),
+      
+      ## Page 3 - make this a pie chart, maybe ethnicity selectable, and then 
+      ## radio buttons for which of the several stats, OR just have multiple pie charts? could be cool
+      tabPanel("Racial Impacts",
+        sidebarLayout(
+          sidebarPanel(
+            checkboxGroupInput("race", "Select race(s):", 
+                               choices = unique(covid$race_eth), 
+                               selected = unique(covid$race_eth)[1]),
+            checkboxGroupInput("variable2", "Select to Compare:", 
+                               choices = c("case_count"),
+                               selected = c("case_count"))),
+          mainPanel(plotOutput("plot2")))),
+      
+      ## Page 4 - table with breakdown of ethnicity per zip code, probably?
+      tabPanel("Demographics",
+        sidebarLayout(
+          sidebarPanel(
+            checkboxGroupInput("checkbox", "Select columns to display:",
+                               choices = c("case_count","pop", "hosp_count", "death_count"),
+                               selected = "case_count")),
+          mainPanel(tableOutput("data_table")))),
+      
+      tabPanel("Our Observations")
       )
     ) 
   )
-)
 
 server <- function(input, output, session) {
   
-  output$sample_data <- renderTable({
-    head(covid_dataZipcode)
-  })
+  ## Zip Code Stats - Page 2
+  
+  ## Racial Impacts - Page 3
+  
+  ## Demographics - Page 4
   
   filtered_data <- reactive({
-    covid_dataZipcode %>%
+    covid %>%
       select(geo_id, input$checkbox)
   })
   
@@ -436,12 +120,12 @@ server <- function(input, output, session) {
   })
   
   output$my_plot <- renderPlot({
-    data_filtered <- covid_dataZipcode %>%
+    data_filtered <- covid %>%
       filter(geo_id %in% input$zip) %>%
       select(input$variable, geo_id)
     
     output$highest_zip <- renderText({
-      data_filtered <- covid_dataZipcode %>%
+      data_filtered <- covid %>%
         filter(geo_id %in% input$zip) %>%
         group_by(geo_id) %>%
         summarize(total_cases = sum(case_count)) %>%
@@ -460,7 +144,7 @@ server <- function(input, output, session) {
   })
   
   output$plot2 <- renderPlot({
-    data_filtered <- covid_dataZipcode %>%
+    data_filtered <- covid %>%
       filter(race_eth %in% input$race) %>%
       select(geo_id, race_eth, case_count, pop)
     
@@ -473,7 +157,7 @@ server <- function(input, output, session) {
     
   })
   observeEvent(input$select_all, {
-    updateCheckboxGroupInput(session, "zip", choices = unique(covid_dataZipcode$geo_id), selected = unique(covid_dataZipcode$geo_id))
+    updateCheckboxGroupInput(session, "zip", choices = unique(covid$geo_id), selected = unique(covid$geo_id))
   }) 
 }
 
