@@ -182,7 +182,7 @@ server <- function(input, output, session) {
     ggplot(dt_top, aes(x = race_eth, y = percent_pop, fill = race_eth)) + 
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("green", "blue", "pink")) +
-      labs(title = "Top Three Race_eth by Case Count Percentage of Pop",
+      labs(title = "communities impacted by Covid",
            x = "Race_eth", y = "Percentage of Pop") +
       theme_minimal()  
   })
