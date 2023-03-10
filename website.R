@@ -97,10 +97,28 @@ ui <- shinyUI(
                                selected = "case_count")),
           mainPanel(tableOutput("data_table")))),
       
-      tabPanel("Our Observations")
-      )
-    ) 
+      tabPanel("Our Observations",
+               sidebarLayout(
+                 sidebarPanel(
+                   h3("Patterns:"),
+                   p("Our analysis (look at the example bar chart on the right for reference), showed that certain zip codes and racial groups were disproportionately impacted by the pandemic. In particular, areas with a high concentration of minority communities, were more severely affected than others."),
+                   h3("Broader Implications:"),
+                   p("The findings suggest that social determinants of health, such as race, location, and socioeconomic status, play a crucial role in determining the level of care and resources available to individuals affected by the pandemic."),
+                   h3("Data Quality:"),
+                   p("When it comes to data quality, it is important to consider the representativeness of the sample population. In the case of COVID-19 testing data, it is true that the data only reflects the people who have chosen to get tested and have the resources to do so. This means that the data may not be representative of the entire population, particularly those who may have limited access to testing or who choose not to get tested. Our dataset was collected by Public Health – Seattle & King County, and we found it to be of reasonable quality."),
+                   h3("Future Ideas:"),
+                   p("In the future we hope show more COVID-19 impact indicators, such as vaccination rates, and scrutinize the correlation between social determinants of health and vaccine allocation. Furthermore, we intend to investigate various geographical locations to assess how COVID-19 impact differs among diverse regions and communities.")
+                 ),
+                 
+                 mainPanel(
+                   plotOutput("bar_graph")
+                 )
+               )
+              )
+    )
   )
+)
+  
 
 server <- function(input, output, session) {
   
@@ -154,7 +172,19 @@ server <- function(input, output, session) {
       ylab(input$variable) +
       ggtitle("a line plot of COVID cases by race per percentage of population") +
       scale_color_discrete(name = "Race")
-    
+  })
+  
+  covid$percent_pop <-   covid$case_count /   covid$pop * 100
+  top_race <- unique(covid[order(-covid$percent_pop), ]$race_eth)[1:3]
+  dt_top <-   covid[covid$race_eth %in% top_race, ]
+  
+  output$bar_graph <- renderPlot({
+    ggplot(dt_top, aes(x = race_eth, y = percent_pop, fill = race_eth)) + 
+      geom_bar(stat = "identity") +
+      scale_fill_manual(values = c("green", "blue", "pink")) +
+      labs(title = "Top Three Race_eth by Case Count Percentage of Pop",
+           x = "Race_eth", y = "Percentage of Pop") +
+      theme_minimal()  
   })
   observeEvent(input$select_all, {
     updateCheckboxGroupInput(session, "zip", choices = unique(covid$geo_id), selected = unique(covid$geo_id))
