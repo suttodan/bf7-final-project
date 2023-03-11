@@ -1,2 +1,2 @@
 # bf7-final-project
-ink to our shiny app url:https://dancsuttonmusic.shinyapps.io/bf7-final-project/
+Link to our shiny app:https://dancsuttonmusic.shinyapps.io/bf7-final-project/
